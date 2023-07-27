@@ -4,6 +4,60 @@
     "D:\\Foothill internship backend\\C#\\Solutions\\Simple_Inventory_Management_System\\Simple_Inventory_Management_System\\Simple_Inventory_Management_System.csproj": {}
   },
   "projects": {
+    "D:\\Foothill internship backend\\C#\\Solutions\\Simple_Inventory_Management_System\\Inventory_Management_Libraray\\Inventory_Management_Libraray.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Foothill internship backend\\C#\\Solutions\\Simple_Inventory_Management_System\\Inventory_Management_Libraray\\Inventory_Management_Libraray.csproj",
+        "projectName": "Inventory_Management_Libraray",
+        "projectPath": "D:\\Foothill internship backend\\C#\\Solutions\\Simple_Inventory_Management_System\\Inventory_Management_Libraray\\Inventory_Management_Libraray.csproj",
+        "packagesPath": "C:\\Users\\tanbo\\.nuget\\packages\\",
+        "outputPath": "D:\\Foothill internship backend\\C#\\Solutions\\Simple_Inventory_Management_System\\Inventory_Management_Libraray\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\tanbo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net5.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net5.0": {
+            "targetAlias": "net5.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net5.0": {
+          "targetAlias": "net5.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.300\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
     "D:\\Foothill internship backend\\C#\\Solutions\\Simple_Inventory_Management_System\\Simple_Inventory_Management_System\\Simple_Inventory_Management_System.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -27,7 +81,11 @@
         "frameworks": {
           "net5.0": {
             "targetAlias": "net5.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "D:\\Foothill internship backend\\C#\\Solutions\\Simple_Inventory_Management_System\\Inventory_Management_Libraray\\Inventory_Management_Libraray.csproj": {
+                "projectPath": "D:\\Foothill internship backend\\C#\\Solutions\\Simple_Inventory_Management_System\\Inventory_Management_Libraray\\Inventory_Management_Libraray.csproj"
+              }
+            }
           }
         },
         "warningProperties": {

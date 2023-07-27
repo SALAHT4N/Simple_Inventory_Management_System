@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\tanbo\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\tanbo\\.nuget\\packages"
+    ]
+  }
+}

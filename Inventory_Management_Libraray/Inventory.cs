@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Simple_Inventory_Management_System.Classes
+namespace Simple_Inventory_Management_System.Inventory_Management_Library
 {
     public class Inventory
     {
         private List<Product> products = new();
 
-        public Product? GetProduct(string name)
+        private Product? GetProduct(string name)
         {
             foreach (var p in products)
             {
@@ -73,11 +73,11 @@ namespace Simple_Inventory_Management_System.Classes
             return ErrorLevels.ProductFound;
         }
 
-        public IEnumerable<Product> GetAllProducts()
+        public IEnumerable<string> GetAllProducts()
         {
             foreach(var p in products)
             {
-                yield return p;
+                yield return p.GetDetails(DisplayFormat.Short);
             }
         }
     }

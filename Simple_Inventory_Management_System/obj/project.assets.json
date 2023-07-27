@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net5.0": {}
+    "net5.0": {
+      "Inventory_Management_Libraray/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v5.0",
+        "compile": {
+          "bin/placeholder/Inventory_Management_Libraray.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Inventory_Management_Libraray.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "Inventory_Management_Libraray/1.0.0": {
+      "type": "project",
+      "path": "../Inventory_Management_Libraray/Inventory_Management_Libraray.csproj",
+      "msbuildProject": "../Inventory_Management_Libraray/Inventory_Management_Libraray.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net5.0": []
+    "net5.0": [
+      "Inventory_Management_Libraray >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\tanbo\\.nuget\\packages\\": {}
@@ -33,7 +52,11 @@
       "frameworks": {
         "net5.0": {
           "targetAlias": "net5.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "D:\\Foothill internship backend\\C#\\Solutions\\Simple_Inventory_Management_System\\Inventory_Management_Libraray\\Inventory_Management_Libraray.csproj": {
+              "projectPath": "D:\\Foothill internship backend\\C#\\Solutions\\Simple_Inventory_Management_System\\Inventory_Management_Libraray\\Inventory_Management_Libraray.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
