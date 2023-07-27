@@ -1,0 +1,5 @@
+D:\Foothill internship backend\C#\Solutions\Simple_Inventory_Management_System\Inventory_Management_Libraray\obj\Debug\net5.0\Inventory_Management_Libraray.csproj.AssemblyReference.cache
+D:\Foothill internship backend\C#\Solutions\Simple_Inventory_Management_System\Inventory_Management_Libraray\obj\Debug\net5.0\Inventory_Management_Libraray.GeneratedMSBuildEditorConfig.editorconfig
+D:\Foothill internship backend\C#\Solutions\Simple_Inventory_Management_System\Inventory_Management_Libraray\obj\Debug\net5.0\Inventory_Management_Libraray.AssemblyInfoInputs.cache
+D:\Foothill internship backend\C#\Solutions\Simple_Inventory_Management_System\Inventory_Management_Libraray\obj\Debug\net5.0\Inventory_Management_Libraray.AssemblyInfo.cs
+D:\Foothill internship backend\C#\Solutions\Simple_Inventory_Management_System\Inventory_Management_Libraray\obj\Debug\net5.0\Inventory_Management_Libraray.csproj.CoreCompileInputs.cache
