@@ -10,7 +10,7 @@ namespace Simple_Inventory_Management_System.Inventory_Management_Library
     {
         private List<Product> products = new();
 
-        private Product? GetProduct(string name)
+        private Product GetProduct(string name)
         {
             foreach (var p in products)
             {
@@ -18,11 +18,16 @@ namespace Simple_Inventory_Management_System.Inventory_Management_Library
             }
             return null;
         }
-        public void AddProduct(string name, double price, int quantity)
+        public ErrorLevels AddProduct(string name, double price, int quantity)
         {
+            if (CheckProductPresence(name) != ErrorLevels.ProductNotFound) 
+                return ErrorLevels.ProductAlreadyExists;
+
             Product addedProduct = new() { Name = name, Price = price };
             products.Add(addedProduct);
             addedProduct.IncreaseQuantity(quantity);
+
+            return ErrorLevels.CommandDone;
         }
         public ErrorLevels RemoveProduct(string name)
         {
@@ -43,6 +48,10 @@ namespace Simple_Inventory_Management_System.Inventory_Management_Library
 
             return ErrorLevels.ProductFound;
         }
+        private ErrorLevels CheckProductPresence(string name) => 
+            (GetProduct(name) != null) ? 
+            ErrorLevels.ProductFound : 
+            ErrorLevels.ProductNotFound;
         
         public ErrorLevels EditProductQuantity(string name, int quantity)
         {

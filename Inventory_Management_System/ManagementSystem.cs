@@ -10,28 +10,28 @@ namespace Inventory_Management_System
     public class ManagementSystem
     {
         static private Inventory inventory = new Inventory();
-        static ErrorLevels AddProduct(string name, double price, int quantity)
+        public static ErrorLevels AddProduct(string name, double price, int quantity)
         {
+            inventory.AddProduct(name, price, quantity);
+            return ErrorLevels.CannotDo;
+        }
+        public static ErrorLevels DeleteProduct(string name)
+        {
+            return ErrorLevels.CannotDo;
 
         }
-
-        static ErrorLevels DeleteProduct(string name)
+        public static ErrorLevels EditProduct(string name, double price, int quantity)
         {
+            return ErrorLevels.CannotDo;
 
         }
-
-        static ErrorLevels EditProduct(string name, double price, int quantity)
+        public static IEnumerable<string> ListAllProducts()
         {
-
+            return inventory.GetAllProducts();
         }
-
-        static void ListAllProducts()
+        public static ErrorLevels SearchForProduct(string name)
         {
-
-        }
-
-        static ErrorLevels SearchForProduct(string name)
-        {
+            return ErrorLevels.CannotDo;
 
         }
     }
