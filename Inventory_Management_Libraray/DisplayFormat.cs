@@ -1,4 +1,4 @@
-﻿namespace Simple_Inventory_Management_System.Inventory_Management_Library
+﻿namespace Inventory_Management_Library
 {
     internal enum DisplayFormat
     {

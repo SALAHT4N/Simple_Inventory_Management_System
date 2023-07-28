@@ -1,6 +1,5 @@
 ﻿using System;
-using Simple_Inventory_Management_System.Inventory_Management_Library;
-
+using Inventory_Management_Library;
 namespace Inventory_Management_System
 {
     public class Program
@@ -24,33 +23,33 @@ namespace Inventory_Management_System
 
         private enum MainMenuCommands
         {
-            ListProducts = 1, AddProduct, SearchProducts
+            ListProducts = 1, AddProduct, SearchProducts, SelectProduct, Exit = 0,
         }
 
-        private static void PrintMainMenu()
+        private static void MainMenu()
         {
-            Console.WriteLine("Choose a command: ");
+            
+            Console.WriteLine("");
             Console.WriteLine($"{(int)MainMenuCommands.ListProducts}. List All Products.");
             Console.WriteLine($"{(int)MainMenuCommands.AddProduct}. Add a Product.");
             Console.WriteLine($"{(int)MainMenuCommands.SearchProducts}. Search for a Product.");
-            Console.WriteLine("");
-            // Add product
-            // List all products
-            // delete product
-            // edit product
-            // search for product
+            Console.WriteLine($"{(int)MainMenuCommands.SelectProduct}. Select a Product.");
 
+            Console.WriteLine($"{(int)MainMenuCommands.Exit}. Exit.");
+            Console.Write("Choose a command: ");
         }
  
         private static void PrintProductsAndMenu()
         {
             var productNames = ManagementSystem.ListAllProducts();
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Yellow;
             foreach (string i in productNames)
             {
                 Console.WriteLine(i);
             }
-            Console.WriteLine(@"--------------------------");
-            Console.Write("Enter a product name to view options: ");
+            Console.WriteLine();
+            Console.ResetColor();
         }
 
         private static void PrintCommandNotFoundMessage()
@@ -64,16 +63,24 @@ namespace Inventory_Management_System
             throw new NotImplementedException();
         }
 
-        private static void SearchForProduct()
+        private static ErrorLevels SearchForProductMenu(out string input)
         {
-            string input = Console.ReadLine();
+            input = Console.ReadLine();
             ErrorLevels status = ManagementSystem.SearchForProduct(input,out string details);
 
             if (status == ErrorLevels.ProductFound)
             {
-                Console.WriteLine("---------------------------------");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+
+                System.Text.StringBuilder line = new();
+                for (int i = 0; i <= 26; i++) line.Append("-");
+
+                Console.WriteLine(line.ToString());
                 Console.WriteLine(details);
-                Console.WriteLine("---------------------------------");
+                Console.WriteLine(line.ToString());
+
+                Console.ResetColor();
+
             }
             else
             {
@@ -81,15 +88,87 @@ namespace Inventory_Management_System
                 Console.WriteLine("\nProduct Not Found!\n");
                 Console.ResetColor();
             }
+            return status;
+        }
+
+        private static void ViewOptions()
+        {
+            Console.WriteLine($"{(int)ProductOptions.EditProduct}. Edit.");
+            Console.WriteLine($"{(int)ProductOptions.DeleteProduct}. Delete.");
+            Console.WriteLine($"{(int)ProductOptions.Exit}. go back.");
+        }
+
+        private enum ProductOptions
+        {
+            EditProduct = 1, DeleteProduct, Exit = 0
+        }
+
+        private static void EditProductMenu()
+        {
+            Console.WriteLine("Enter values separated by commas (item,10,_)\t'$' No Change.");
+        }
+        private static void EditProduct(string selectedProductName)
+        {
+            EditProductMenu();
+            ManagementSystem.SearchForProduct(selectedProductName, out ProductDetails details);
+            
+            string input = Console.ReadLine();
+            var values = input.Split(',');
+
+            if (values.Length < 3) return;
+
+            var newDetails = new ProductDetails(
+                (values[0] == "$") ? details.Name : values[0],
+                (values[1] == "$") ? details.Price : double.Parse(values[1]),
+                (values[2] == "$") ? details.Quantity : int.Parse(values[2])
+            );
+
+            ManagementSystem.EditProduct(selectedProductName, newDetails);
+        }
+        private static void DeleteProductMenu()
+        {
 
         }
-        
+        private static void DeleteProduct(string name)
+        {
+            DeleteProductMenu();
+        }
+        private static void SelectProductMenu()
+        {
+            Console.WriteLine("Enter Product Name to view options: ");
+
+            var status = Program.SearchForProductMenu(out var selectedProductName);
+
+            if (status == ErrorLevels.ProductNotFound) return;
+            
+            Program.ViewOptions();
+            Console.Write("Choose an option: ");
+
+            int.TryParse(Console.ReadLine(), out int input);
+            if (input == (int)ProductOptions.EditProduct)
+            {
+                EditProduct(selectedProductName);
+
+            } else if (input == (int)ProductOptions.DeleteProduct)
+            {
+                DeleteProduct(selectedProductName);
+            } else if (input == (int) ProductOptions.Exit)
+            {
+                return;
+            } else
+            {
+                PrintCommandNotFoundMessage();
+                // recall the function we're in
+                SelectProductMenu();
+            }
+        }
+
         private static void Run()
         {
             int choice = 0;
             while (true)
             {
-                PrintMainMenu();
+                MainMenu();
                 int.TryParse(Console.ReadLine().Split(' ')[0], out choice);
 
                 switch (choice)
@@ -101,8 +180,13 @@ namespace Inventory_Management_System
                         PrintCreateNewProduct();
                         break;
                     case 3:
-                        SearchForProduct();
+                        SearchForProductMenu(out string _);
                         break;
+                    case 4:
+                        SelectProductMenu();
+                        ViewOptions();
+                        break;
+
                     default:
                         PrintCommandNotFoundMessage();
                         break;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Simple_Inventory_Management_System.Inventory_Management_Library
+namespace Inventory_Management_Library
 {
     internal class Product
     {
@@ -37,8 +37,8 @@ namespace Simple_Inventory_Management_System.Inventory_Management_Library
       
         private string ShortDisplay() => $"{Name}: {Quantity} in stock";
         private string FullDisplay() =>
-            $"| Name: {Name}\t\t\t|\n" +
-            $"| Price: {Price}$\t\t\t|\n" +
-            $"| Stock: {Quantity}\t\t\t|";
+            $"| Name: {Name}".PadRight(25) + "|\n" +
+            $"| Price: {Price}$".PadRight(25) + "|\n" +
+            $"| Stock: {Quantity}".PadRight(25) + "|";
     }
 }

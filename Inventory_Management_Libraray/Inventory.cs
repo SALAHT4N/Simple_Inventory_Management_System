@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Simple_Inventory_Management_System.Inventory_Management_Library
+namespace Inventory_Management_Library
 {
     public class Inventory
     {
@@ -84,7 +84,18 @@ namespace Simple_Inventory_Management_System.Inventory_Management_Library
         }
         public string GetProductDetails(string name) =>
             GetProduct(name).GetDetails(DisplayFormat.Full);
-        
+        public ProductDetails GetProductDetailsRecord(string name)
+        {
+            var p = GetProduct(name);
+            return new ProductDetails(p.Name, p.Price, p.Quantity);
+
+        }
+
+        public double GetProductPrice(string name) =>
+            GetProduct(name).Price;
+        public int GetProductQuantity(string name) =>
+            GetProduct(name).Quantity;
+
         public IEnumerable<string> GetAllProducts()
         {
             foreach(var p in products)

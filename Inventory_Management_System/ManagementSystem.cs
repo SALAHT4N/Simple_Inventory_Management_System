@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Simple_Inventory_Management_System.Inventory_Management_Library;
+using Inventory_Management_Library;
 
 namespace Inventory_Management_System
 {
@@ -20,23 +20,40 @@ namespace Inventory_Management_System
             return ErrorLevels.CannotDo;
 
         }
-        public static ErrorLevels EditProduct(string name, double price, int quantity)
+        public static ErrorLevels EditProduct(string name, ProductDetails newDetails)
         {
-            return ErrorLevels.CannotDo;
+            inventory.EditProductName(name, newDetails.Name);
+            inventory.EditProductPrice(name, newDetails.Price);
+            inventory.EditProductQuantity(name, newDetails.Quantity);
 
+            return ErrorLevels.CommandDone;
         }
         public static IEnumerable<string> ListAllProducts() =>
             inventory.GetAllProducts();
 
         public static ErrorLevels SearchForProduct(string name, out string details){
-            if (inventory.CheckProductPresence(name) != ErrorLevels.ProductFound)
+            ErrorLevels level = inventory.CheckProductPresence(name);
+
+            details = null;
+            if (level == ErrorLevels.ProductFound)
             {
-                details = null;
-                return ErrorLevels.ProductNotFound;
+                details = inventory.GetProductDetails(name);
             }
 
-            details = inventory.GetProductDetails(name);
-            return ErrorLevels.ProductFound;
+            return level;
+        }
+
+        public static ErrorLevels SearchForProduct(string name, out ProductDetails details)
+        {
+            ErrorLevels level = inventory.CheckProductPresence(name);
+
+            details = null;
+            if (level == ErrorLevels.ProductFound)
+            {
+                details = inventory.GetProductDetailsRecord(name);
+            }
+
+            return level;
         }
 
     }

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Inventory_Management_Library
 {
-    public enum ErrorLevels
+    public record ProductDetails(string Name, double Price, int Quantity)
     {
-        ProductNotFound, ProductAlreadyExists, CannotDo, UnknownCommand, CommandDone, ProductFound
+        
     }
 }
