@@ -37,8 +37,8 @@ namespace Simple_Inventory_Management_System.Inventory_Management_Library
       
         private string ShortDisplay() => $"{Name}: {Quantity} in stock";
         private string FullDisplay() =>
-            $"Name: {Name}\n" +
-            $"Price: {Price}$\n" +
-            $"Stock: {Quantity}";
+            $"| Name: {Name}\t\t\t|\n" +
+            $"| Price: {Price}$\t\t\t|\n" +
+            $"| Stock: {Quantity}\t\t\t|";
     }
 }

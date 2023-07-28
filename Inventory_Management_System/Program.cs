@@ -24,7 +24,7 @@ namespace Inventory_Management_System
 
         private enum MainMenuCommands
         {
-            ListProducts = 1, AddProduct
+            ListProducts = 1, AddProduct, SearchProducts
         }
 
         private static void PrintMainMenu()
@@ -32,6 +32,7 @@ namespace Inventory_Management_System
             Console.WriteLine("Choose a command: ");
             Console.WriteLine($"{(int)MainMenuCommands.ListProducts}. List All Products.");
             Console.WriteLine($"{(int)MainMenuCommands.AddProduct}. Add a Product.");
+            Console.WriteLine($"{(int)MainMenuCommands.SearchProducts}. Search for a Product.");
             Console.WriteLine("");
             // Add product
             // List all products
@@ -57,18 +58,32 @@ namespace Inventory_Management_System
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Command not found! ");
             Console.ResetColor();
-        }
-        private static void Init()
+        }        
+        private static void PrintCreateNewProduct()
         {
-            // TODO Add placeholder products to inventory.
-            ManagementSystem.AddProduct("cola", 2.5, 5);
-            ManagementSystem.AddProduct("pepsi", 2, 6);
-            ManagementSystem.AddProduct("cola2", 2.5, 5);
-            ManagementSystem.AddProduct("cola3", 2.5, 5);
-            ManagementSystem.AddProduct("cola4", 2.5, 5);
-            ManagementSystem.AddProduct("cola5", 2.5, 5);
+            throw new NotImplementedException();
+        }
+
+        private static void SearchForProduct()
+        {
+            string input = Console.ReadLine();
+            ErrorLevels status = ManagementSystem.SearchForProduct(input,out string details);
+
+            if (status == ErrorLevels.ProductFound)
+            {
+                Console.WriteLine("---------------------------------");
+                Console.WriteLine(details);
+                Console.WriteLine("---------------------------------");
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\nProduct Not Found!\n");
+                Console.ResetColor();
+            }
 
         }
+        
         private static void Run()
         {
             int choice = 0;
@@ -85,20 +100,27 @@ namespace Inventory_Management_System
                     case 2:
                         PrintCreateNewProduct();
                         break;
+                    case 3:
+                        SearchForProduct();
+                        break;
                     default:
                         PrintCommandNotFoundMessage();
                         break;
                 }
-                
-                
             }
         }
 
-        private static void PrintCreateNewProduct()
+        private static void Init()
         {
-            throw new NotImplementedException();
-        }
+            // TODO Add placeholder products to inventory.
+            ManagementSystem.AddProduct("cola", 2.5, 5);
+            ManagementSystem.AddProduct("pepsi", 2, 6);
+            ManagementSystem.AddProduct("cola2", 2.5, 5);
+            ManagementSystem.AddProduct("cola3", 2.5, 5);
+            ManagementSystem.AddProduct("cola4", 2.5, 5);
+            ManagementSystem.AddProduct("cola5", 2.5, 5);
 
+        }
         public static void Main(string[] args)
         {
             Init();

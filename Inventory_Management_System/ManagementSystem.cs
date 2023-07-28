@@ -25,14 +25,19 @@ namespace Inventory_Management_System
             return ErrorLevels.CannotDo;
 
         }
-        public static IEnumerable<string> ListAllProducts()
-        {
-            return inventory.GetAllProducts();
-        }
-        public static ErrorLevels SearchForProduct(string name)
-        {
-            return ErrorLevels.CannotDo;
+        public static IEnumerable<string> ListAllProducts() =>
+            inventory.GetAllProducts();
 
+        public static ErrorLevels SearchForProduct(string name, out string details){
+            if (inventory.CheckProductPresence(name) != ErrorLevels.ProductFound)
+            {
+                details = null;
+                return ErrorLevels.ProductNotFound;
+            }
+
+            details = inventory.GetProductDetails(name);
+            return ErrorLevels.ProductFound;
         }
+
     }
 }

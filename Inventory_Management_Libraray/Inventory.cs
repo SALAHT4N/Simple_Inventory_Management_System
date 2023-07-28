@@ -18,6 +18,7 @@ namespace Simple_Inventory_Management_System.Inventory_Management_Library
             }
             return null;
         }
+
         public ErrorLevels AddProduct(string name, double price, int quantity)
         {
             if (CheckProductPresence(name) != ErrorLevels.ProductNotFound) 
@@ -48,7 +49,7 @@ namespace Simple_Inventory_Management_System.Inventory_Management_Library
 
             return ErrorLevels.ProductFound;
         }
-        private ErrorLevels CheckProductPresence(string name) => 
+        public ErrorLevels CheckProductPresence(string name) => 
             (GetProduct(name) != null) ? 
             ErrorLevels.ProductFound : 
             ErrorLevels.ProductNotFound;
@@ -81,7 +82,9 @@ namespace Simple_Inventory_Management_System.Inventory_Management_Library
 
             return ErrorLevels.ProductFound;
         }
-
+        public string GetProductDetails(string name) =>
+            GetProduct(name).GetDetails(DisplayFormat.Full);
+        
         public IEnumerable<string> GetAllProducts()
         {
             foreach(var p in products)
