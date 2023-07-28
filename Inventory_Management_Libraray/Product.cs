@@ -13,9 +13,17 @@ namespace Inventory_Management_Library
             get; set;
         } = string.Empty;
 
+        private double price;
         public double Price
         {
-            get; set;
+            get 
+            {
+                return price;
+            }
+            set
+            {
+                price = (value > 0) ? value : 0;
+            }
         }
 
         public int Quantity

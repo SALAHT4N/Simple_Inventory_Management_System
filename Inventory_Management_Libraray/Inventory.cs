@@ -80,7 +80,7 @@ namespace Inventory_Management_Library
             Product edit = GetProduct(name);
             edit.Name = newName;
 
-            return ErrorLevels.ProductFound;
+            return ErrorLevels.CommandDone;
         }
         public string GetProductDetails(string name) =>
             GetProduct(name).GetDetails(DisplayFormat.Full);

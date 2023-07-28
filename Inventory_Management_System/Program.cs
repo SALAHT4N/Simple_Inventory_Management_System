@@ -4,7 +4,7 @@ namespace Inventory_Management_System
 {
     public class Program
     {
-        
+
         private static void PrintTitleLogo()
         {
             Console.ForegroundColor = ConsoleColor.Blue;
@@ -28,7 +28,7 @@ namespace Inventory_Management_System
 
         private static void MainMenu()
         {
-            
+
             Console.WriteLine("");
             Console.WriteLine($"{(int)MainMenuCommands.ListProducts}. List All Products.");
             Console.WriteLine($"{(int)MainMenuCommands.AddProduct}. Add a Product.");
@@ -38,7 +38,7 @@ namespace Inventory_Management_System
             Console.WriteLine($"{(int)MainMenuCommands.Exit}. Exit.");
             Console.Write("Choose a command: ");
         }
- 
+
         private static void PrintProductsAndMenu()
         {
             var productNames = ManagementSystem.ListAllProducts();
@@ -57,16 +57,37 @@ namespace Inventory_Management_System
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Command not found! ");
             Console.ResetColor();
-        }        
-        private static void PrintCreateNewProduct()
+        }
+        private static void CreateNewProductMenu()
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Enter values separated by commas (item,10,20)");
+        }
+        private static ErrorLevels CreateNewProduct()
+        {
+            CreateNewProductMenu();
+            string input = Console.ReadLine();
+            var values = input.Split(',');
+
+
+            if (values.Length < 3) return ErrorLevels.WrongInput;
+
+            var level = ManagementSystem.SearchForProduct(values[0], out string _);
+            if (level == ErrorLevels.ProductFound) return ErrorLevels.ProductAlreadyExists;
+
+            var newDetails = new ProductDetails(
+                values[0],
+                double.Parse(values[1]),
+                int.Parse(values[2])
+            );
+
+            ManagementSystem.AddProduct(newDetails);
+            return ErrorLevels.CommandDone;
         }
 
         private static ErrorLevels SearchForProductMenu(out string input)
         {
             input = Console.ReadLine();
-            ErrorLevels status = ManagementSystem.SearchForProduct(input,out string details);
+            ErrorLevels status = ManagementSystem.SearchForProduct(input, out string details);
 
             if (status == ErrorLevels.ProductFound)
             {
@@ -107,15 +128,16 @@ namespace Inventory_Management_System
         {
             Console.WriteLine("Enter values separated by commas (item,10,_)\t'$' No Change.");
         }
-        private static void EditProduct(string selectedProductName)
+        private static ErrorLevels EditProduct(string selectedProductName)
         {
             EditProductMenu();
-            ManagementSystem.SearchForProduct(selectedProductName, out ProductDetails details);
+            var level = ManagementSystem.SearchForProduct(selectedProductName, out ProductDetails details);
             
+
             string input = Console.ReadLine();
             var values = input.Split(',');
 
-            if (values.Length < 3) return;
+            if (values.Length < 3) return ErrorLevels.WrongInput;
 
             var newDetails = new ProductDetails(
                 (values[0] == "$") ? details.Name : values[0],
@@ -123,7 +145,7 @@ namespace Inventory_Management_System
                 (values[2] == "$") ? details.Quantity : int.Parse(values[2])
             );
 
-            ManagementSystem.EditProduct(selectedProductName, newDetails);
+            return ManagementSystem.EditProduct(selectedProductName, newDetails);
         }
         private static void DeleteProductMenu()
         {
@@ -140,19 +162,22 @@ namespace Inventory_Management_System
             var status = Program.SearchForProductMenu(out var selectedProductName);
 
             if (status == ErrorLevels.ProductNotFound) return;
-            
+
             Program.ViewOptions();
             Console.Write("Choose an option: ");
 
             int.TryParse(Console.ReadLine(), out int input);
             if (input == (int)ProductOptions.EditProduct)
             {
-                EditProduct(selectedProductName);
-
+                var level = EditProduct(selectedProductName);
+                if (level == ErrorLevels.ProductFound || level == ErrorLevels.CannotDo) BadCommandMessage("Product Already Exists!");
+                else if (level == ErrorLevels.CommandDone) SuccessfulCommandMessage("Edited Successfully! ");
+                else if (level == ErrorLevels.WrongInput) BadCommandMessage("Check your input! ");
+                
             } else if (input == (int)ProductOptions.DeleteProduct)
             {
                 DeleteProduct(selectedProductName);
-            } else if (input == (int) ProductOptions.Exit)
+            } else if (input == (int)ProductOptions.Exit)
             {
                 return;
             } else
@@ -163,6 +188,18 @@ namespace Inventory_Management_System
             }
         }
 
+        private static void SuccessfulCommandMessage(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
+        private static void BadCommandMessage(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
         private static void Run()
         {
             int choice = 0;
@@ -177,7 +214,10 @@ namespace Inventory_Management_System
                         PrintProductsAndMenu();
                         break;
                     case 2:
-                        PrintCreateNewProduct();
+                        if (CreateNewProduct() == ErrorLevels.CommandDone)
+                            SuccessfulCommandMessage("Added Successfully! ");
+                        else
+                            BadCommandMessage("Product Already Exists! ");
                         break;
                     case 3:
                         SearchForProductMenu(out string _);
@@ -197,12 +237,12 @@ namespace Inventory_Management_System
         private static void Init()
         {
             // TODO Add placeholder products to inventory.
-            ManagementSystem.AddProduct("cola", 2.5, 5);
-            ManagementSystem.AddProduct("pepsi", 2, 6);
-            ManagementSystem.AddProduct("cola2", 2.5, 5);
-            ManagementSystem.AddProduct("cola3", 2.5, 5);
-            ManagementSystem.AddProduct("cola4", 2.5, 5);
-            ManagementSystem.AddProduct("cola5", 2.5, 5);
+            ManagementSystem.AddProduct(new ProductDetails("cola", 2.5, 5));
+            ManagementSystem.AddProduct(new ProductDetails("pepsi", 2, 6));
+            ManagementSystem.AddProduct(new ProductDetails("cola2", 2.5, 5));
+            ManagementSystem.AddProduct(new ProductDetails("cola3", 2.5, 5));
+            ManagementSystem.AddProduct(new ProductDetails("cola4", 2.5, 5));
+            ManagementSystem.AddProduct(new ProductDetails("cola5", 2.5, 5));
 
         }
         public static void Main(string[] args)
