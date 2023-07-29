@@ -17,12 +17,14 @@ namespace Inventory_Management_System
         }
         public static ErrorLevels DeleteProduct(string name)
         {
-            return ErrorLevels.CannotDo;
-
+            var status = inventory.RemoveProduct(name);
+            return status;
         }
         public static ErrorLevels EditProduct(string name, ProductDetails newDetails)
         {
-            var status1 = inventory.EditProductName(name, newDetails.Name);
+            ErrorLevels status1 = ErrorLevels.CommandDone;
+            if (newDetails.Name != name)
+                status1 = inventory.EditProductName(name, newDetails.Name);
             var status2 = inventory.EditProductPrice(name, newDetails.Price);
             var status3 = inventory.EditProductQuantity(name, newDetails.Quantity);
 
@@ -30,7 +32,7 @@ namespace Inventory_Management_System
                 status1 == ErrorLevels.CommandDone &&
                 status2 == ErrorLevels.CommandDone &&
                 status3 == ErrorLevels.CommandDone 
-                ) ? ErrorLevels.CommandDone: ErrorLevels.CannotDo;
+                ) ? ErrorLevels.CommandDone: ErrorLevels.ProductAlreadyExists;
         }
         public static IEnumerable<string> ListAllProducts() =>
             inventory.GetAllProducts();

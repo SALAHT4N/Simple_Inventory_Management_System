@@ -7,7 +7,7 @@ namespace Inventory_Management_System
 
         private static void PrintTitleLogo()
         {
-            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(@"
   _____                      _                     __  __                                                   _      _____           _                 
  |_   _|                    | |                   |  \/  |                                                 | |    / ____|         | |                
@@ -23,7 +23,7 @@ namespace Inventory_Management_System
 
         private enum MainMenuCommands
         {
-            ListProducts = 1, AddProduct, SearchProducts, SelectProduct, Exit = 0,
+            ListProducts = 1, AddProduct, SelectProduct, Exit = 0,
         }
 
         private static void MainMenu()
@@ -32,8 +32,7 @@ namespace Inventory_Management_System
             Console.WriteLine("");
             Console.WriteLine($"{(int)MainMenuCommands.ListProducts}. List All Products.");
             Console.WriteLine($"{(int)MainMenuCommands.AddProduct}. Add a Product.");
-            Console.WriteLine($"{(int)MainMenuCommands.SearchProducts}. Search for a Product.");
-            Console.WriteLine($"{(int)MainMenuCommands.SelectProduct}. Select a Product.");
+            Console.WriteLine($"{(int)MainMenuCommands.SelectProduct}. Search for a Product.");
 
             Console.WriteLine($"{(int)MainMenuCommands.Exit}. Exit.");
             Console.Write("Choose a command: ");
@@ -52,15 +51,13 @@ namespace Inventory_Management_System
             Console.ResetColor();
         }
 
-        private static void PrintCommandNotFoundMessage()
+        private static void CommandNotFoundMessage()
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Command not found! ");
-            Console.ResetColor();
+            BadCommandMessage("Command not found! ");
         }
         private static void CreateNewProductMenu()
         {
-            Console.WriteLine("Enter values separated by commas (item,10,20)");
+            Console.WriteLine("Enter values separated by commas  ([name],[price],[quantity])");
         }
         private static ErrorLevels CreateNewProduct()
         {
@@ -80,11 +77,11 @@ namespace Inventory_Management_System
                 int.Parse(values[2])
             );
 
-            ManagementSystem.AddProduct(newDetails);
-            return ErrorLevels.CommandDone;
+            
+            return ManagementSystem.AddProduct(newDetails);
         }
 
-        private static ErrorLevels SearchForProductMenu(out string input)
+        private static ErrorLevels SearchForProduct(out string input)
         {
             input = Console.ReadLine();
             ErrorLevels status = ManagementSystem.SearchForProduct(input, out string details);
@@ -94,7 +91,7 @@ namespace Inventory_Management_System
                 Console.ForegroundColor = ConsoleColor.Yellow;
 
                 System.Text.StringBuilder line = new();
-                for (int i = 0; i <= 26; i++) line.Append("-");
+                for (int i = 0; i < 26; i++) line.Append('-');
 
                 Console.WriteLine(line.ToString());
                 Console.WriteLine(details);
@@ -105,9 +102,7 @@ namespace Inventory_Management_System
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("\nProduct Not Found!\n");
-                Console.ResetColor();
+                BadCommandMessage("Product Not Found! ");
             }
             return status;
         }
@@ -126,13 +121,12 @@ namespace Inventory_Management_System
 
         private static void EditProductMenu()
         {
-            Console.WriteLine("Enter values separated by commas (item,10,_)\t'$' No Change.");
+            Console.WriteLine("Enter values separated by commas ([name],[price],[quantity])\t'$' No Change.");
         }
         private static ErrorLevels EditProduct(string selectedProductName)
         {
             EditProductMenu();
             var level = ManagementSystem.SearchForProduct(selectedProductName, out ProductDetails details);
-            
 
             string input = Console.ReadLine();
             var values = input.Split(',');
@@ -149,55 +143,72 @@ namespace Inventory_Management_System
         }
         private static void DeleteProductMenu()
         {
-
+            Console.WriteLine("Enter Product Name to delete: ");
         }
-        private static void DeleteProduct(string name)
+        private static ErrorLevels DeleteProduct(string name)
         {
             DeleteProductMenu();
+            
+            var status = ManagementSystem.DeleteProduct(name);
+            return status;
+        }
+
+        private static void FilterInput(string selectedName, int input)
+        {
+            ErrorLevels level;
+            switch ((ProductOptions)input)
+            {
+                case ProductOptions.EditProduct:
+
+                    level = EditProduct(selectedName);
+                    if (level == ErrorLevels.ProductAlreadyExists) BadCommandMessage("Product Already Exists!");
+                    else if (level == ErrorLevels.CommandDone) SuccessfulCommandMessage("Edited Successfully! ");
+                    else if (level == ErrorLevels.WrongInput) BadCommandMessage("Check your input! ");
+                    break;
+
+                case ProductOptions.DeleteProduct:
+
+                    level = DeleteProduct(selectedName);
+                    if (level == ErrorLevels.CommandDone) SuccessfulCommandMessage("Delete Successfully! ");
+                    else BadCommandMessage("Product Not Found! ");
+
+                    break;
+
+                case ProductOptions.Exit:
+                    return;
+
+                default:
+                    CommandNotFoundMessage();
+                    SelectProductMenu(); // recall the function we're in
+                    break;
+
+            }
         }
         private static void SelectProductMenu()
         {
             Console.WriteLine("Enter Product Name to view options: ");
 
-            var status = Program.SearchForProductMenu(out var selectedProductName);
+            var status = SearchForProduct(out var selectedProductName);
 
             if (status == ErrorLevels.ProductNotFound) return;
 
-            Program.ViewOptions();
+            ViewOptions();
             Console.Write("Choose an option: ");
 
             int.TryParse(Console.ReadLine(), out int input);
-            if (input == (int)ProductOptions.EditProduct)
-            {
-                var level = EditProduct(selectedProductName);
-                if (level == ErrorLevels.ProductFound || level == ErrorLevels.CannotDo) BadCommandMessage("Product Already Exists!");
-                else if (level == ErrorLevels.CommandDone) SuccessfulCommandMessage("Edited Successfully! ");
-                else if (level == ErrorLevels.WrongInput) BadCommandMessage("Check your input! ");
-                
-            } else if (input == (int)ProductOptions.DeleteProduct)
-            {
-                DeleteProduct(selectedProductName);
-            } else if (input == (int)ProductOptions.Exit)
-            {
-                return;
-            } else
-            {
-                PrintCommandNotFoundMessage();
-                // recall the function we're in
-                SelectProductMenu();
-            }
+            FilterInput(selectedProductName, input);
         }
 
         private static void SuccessfulCommandMessage(string message)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(message);
+            Console.WriteLine("\n" + message + "\n");
             Console.ResetColor();
         }
         private static void BadCommandMessage(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(message);
+            Console.WriteLine("\n" + message + "\n");
             Console.ResetColor();
         }
         private static void Run()
@@ -220,15 +231,12 @@ namespace Inventory_Management_System
                             BadCommandMessage("Product Already Exists! ");
                         break;
                     case 3:
-                        SearchForProductMenu(out string _);
-                        break;
-                    case 4:
                         SelectProductMenu();
-                        ViewOptions();
                         break;
-
+                    case 0:
+                        return;
                     default:
-                        PrintCommandNotFoundMessage();
+                        CommandNotFoundMessage();
                         break;
                 }
             }
@@ -250,7 +258,6 @@ namespace Inventory_Management_System
             Init();
             PrintTitleLogo();
             Run();
-
         }
     }
 }
