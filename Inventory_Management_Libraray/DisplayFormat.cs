@@ -2,6 +2,7 @@
 {
     internal enum DisplayFormat
     {
+        // often public
         Short, Full
     }
 }

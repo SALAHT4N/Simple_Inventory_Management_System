@@ -37,6 +37,7 @@ namespace Inventory_Management_Library
         }
         public void Consume(int amount)
         {
+            // return a value to indicate error
             int amountLeft = Quantity - amount;
             Quantity = (amountLeft >= 0) ? amountLeft : 0;
         }

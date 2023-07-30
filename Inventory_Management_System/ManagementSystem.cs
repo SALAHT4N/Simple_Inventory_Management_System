@@ -22,6 +22,7 @@ namespace Inventory_Management_System
         }
         public static ErrorLevels EditProduct(string name, ProductDetails newDetails)
         {
+            // edit should be one method
             ErrorLevels status1 = ErrorLevels.CommandDone;
             if (newDetails.Name != name)
                 status1 = inventory.EditProductName(name, newDetails.Name);
