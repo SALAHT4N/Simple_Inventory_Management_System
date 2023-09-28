@@ -6,7 +6,8 @@ namespace Inventory_Management_System
 {
     public class ManagementSystem
     {
-        static private Inventory inventory = new Inventory(new ProductStaticRepository());
+        //static private Inventory inventory = new Inventory(new ProductStaticRepository());
+        static private Inventory inventory = new Inventory(new SqlServerProductRepository());
         public static ErrorLevels AddProduct(ProductDetails details)
         {
             var status = inventory.AddProduct(details.Name, details.Price, details.Quantity);
@@ -21,18 +22,6 @@ namespace Inventory_Management_System
         {
             // edit should be one method
             return inventory.EditProduct(name, newDetails);
-
-            //ErrorLevels status1 = ErrorLevels.CommandDone;
-            //if (newDetails.Name != name)
-            //    status1 = inventory.EditProductName(name, newDetails.Name);
-            //var status2 = inventory.EditProductPrice(name, newDetails.Price);
-            //var status3 = inventory.EditProductQuantity(name, newDetails.Quantity);
-
-            //return (
-            //    status1 == ErrorLevels.CommandDone &&
-            //    status2 == ErrorLevels.CommandDone &&
-            //    status3 == ErrorLevels.CommandDone
-            //    ) ? ErrorLevels.CommandDone : ErrorLevels.ProductAlreadyExists;
         }
         public static IEnumerable<string> ListAllProducts() =>
             inventory.GetAllProducts();
@@ -50,7 +39,6 @@ namespace Inventory_Management_System
 
             return level;
         }
-
         public static ErrorLevels SearchForProduct(string name, out ProductDetails details)
         {
             ErrorLevels level = inventory.CheckProductPresence(name);
