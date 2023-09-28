@@ -3,6 +3,7 @@ using Inventory_Management_Library;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Transactions;
 
 namespace Inventory_Management_Libraray.repos
 {
@@ -210,24 +211,35 @@ namespace Inventory_Management_Libraray.repos
         }
         private bool SafeProductUpdate(string productName, Product newProduct)
         {
+            bool updateState = false;
             _connection.Open();
             SqlTransaction transaction = _connection.BeginTransaction();
-
-            using (var sqlCommand = new SqlCommand())
+            try
             {
-                sqlCommand.Transaction = transaction;
-                sqlCommand.Connection = _connection;
+                
+                using (var sqlCommand = new SqlCommand())
+                {
+                    sqlCommand.Transaction = transaction;
+                    sqlCommand.Connection = _connection;
 
-                if (IsProductNameReserved(newProduct.Name, sqlCommand))
-                    return false;
+                    if (IsProductNameReserved(newProduct.Name, sqlCommand))
+                        return false;
 
-                DeleteProductCommand(productName, sqlCommand); // delete old product
-                InsertProductCommand(newProduct, sqlCommand); // inserts new one
+                    DeleteProductCommand(productName, sqlCommand); // delete old product
+                    InsertProductCommand(newProduct, sqlCommand); // inserts new one
+                }
+                transaction.Commit();
+                updateState = true;
             }
-            transaction.Commit();
-            transaction.Dispose();
-
-            return true;
+            catch (SqlException ex)
+            {
+                transaction.Rollback();
+            }
+            finally
+            {
+                transaction.Dispose();
+            }
+            return updateState;
         }
 
         private bool IsProductNameReserved(string name, SqlCommand sqlCommand)
