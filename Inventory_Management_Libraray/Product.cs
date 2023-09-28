@@ -1,6 +1,6 @@
 ﻿namespace Inventory_Management_Library
 {
-    internal class Product
+    public class Product
     {
         public string Name
         {

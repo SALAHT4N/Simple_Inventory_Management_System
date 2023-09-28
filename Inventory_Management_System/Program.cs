@@ -161,7 +161,7 @@ namespace Inventory_Management_System
                 case ProductOptions.EditProduct:
 
                     level = EditProduct(selectedName);
-                    if (level == ErrorLevels.ProductAlreadyExists) BadCommandMessage("Product Already Exists!");
+                    if (level == ErrorLevels.CannotDo) BadCommandMessage("Product Already Exists!");
                     else if (level == ErrorLevels.CommandDone) SuccessfulCommandMessage("Edited Successfully! ");
                     else if (level == ErrorLevels.WrongInput) BadCommandMessage("Check your input! ");
                     break;
