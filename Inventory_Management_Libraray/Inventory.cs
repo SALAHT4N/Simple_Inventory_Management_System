@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Inventory_Management_Library
 {
@@ -21,7 +17,7 @@ namespace Inventory_Management_Library
 
         public ErrorLevels AddProduct(string name, double price, int quantity)
         {
-            if (CheckProductPresence(name) != ErrorLevels.ProductNotFound) 
+            if (CheckProductPresence(name) != ErrorLevels.ProductNotFound)
                 return ErrorLevels.ProductAlreadyExists;
 
             Product addedProduct = new() { Name = name, Price = price };
@@ -49,11 +45,11 @@ namespace Inventory_Management_Library
 
             return ErrorLevels.ProductFound;
         }
-        public ErrorLevels CheckProductPresence(string name) => 
-            (GetProduct(name) != null) ? 
-            ErrorLevels.ProductFound : 
+        public ErrorLevels CheckProductPresence(string name) =>
+            (GetProduct(name) != null) ?
+            ErrorLevels.ProductFound :
             ErrorLevels.ProductNotFound;
-        
+
         public ErrorLevels EditProductQuantity(string name, int quantity)
         {
             Product edit = GetProduct(name);
@@ -98,7 +94,7 @@ namespace Inventory_Management_Library
 
         public IEnumerable<string> GetAllProducts()
         {
-            foreach(var p in products)
+            foreach (var p in products)
             {
                 yield return p.GetDetails(DisplayFormat.Short);
             }
