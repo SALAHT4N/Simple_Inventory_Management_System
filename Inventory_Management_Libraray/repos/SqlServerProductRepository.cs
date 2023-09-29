@@ -3,7 +3,6 @@ using Inventory_Management_Library;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
-using System.Transactions;
 
 namespace Inventory_Management_Libraray.repos
 {
@@ -27,32 +26,27 @@ namespace Inventory_Management_Libraray.repos
             {
                 Console.WriteLine(e.ToString());
             }
-
         }
 
         ~SqlServerProductRepository()
         {
-            _connection.Close();
             _connection.Dispose();
         }
         public bool AddProduct(Product product)
         {
+            int numOfRows = 0;
             try
             {
-                SqlCommand cmd = new SqlCommand("INSERT INTO Products(name, price, quantity) VALUES (@p_name, @p_price, @p_quantity)", _connection);
-                cmd.Parameters.AddWithValue("@p_name", product.Name);
-                cmd.Parameters.AddWithValue("@p_price", product.Price);
-                cmd.Parameters.AddWithValue("@p_quantity", product.Quantity);
-
-                _connection.Open();
-                int numOfRows = cmd.ExecuteNonQuery();
-                _connection.Close();
-
-                if (numOfRows > 0)
+                using (var cmd = new SqlCommand("INSERT INTO Products(name, price, quantity) VALUES (@p_name, @p_price, @p_quantity)", _connection))
                 {
-                    return true;
-                }
+                    cmd.Parameters.AddWithValue("@p_name", product.Name);
+                    cmd.Parameters.AddWithValue("@p_price", product.Price);
+                    cmd.Parameters.AddWithValue("@p_quantity", product.Quantity);
 
+                    _connection.Open();
+                    numOfRows = cmd.ExecuteNonQuery();
+
+                }
             }
             catch (SqlException ex)
             {
@@ -61,13 +55,16 @@ namespace Inventory_Management_Libraray.repos
                     Console.WriteLine($"SQL Server Error: {error.Message}");
                 }
             }
-
-            return false;
+            finally
+            {
+                _connection.Close();
+            }
+            return numOfRows > 0;
         }
 
         public IEnumerable<Product> GetAllProducts()
         {
-            List<Product> products = new List<Product>();
+            List<Product> products = null;
 
             try
             {
@@ -76,12 +73,7 @@ namespace Inventory_Management_Libraray.repos
                     _connection.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        while (reader.Read())
-                        {
-                            var fetchedProduct = new Product() { Name = reader.GetString(0), Price = (float)reader.GetDouble(1) };
-                            fetchedProduct.IncreaseQuantity(reader.GetInt32(2));
-                            products.Add(fetchedProduct);
-                        }
+                        products = ReadProductList(reader);
                     }
                 }
 
@@ -93,7 +85,10 @@ namespace Inventory_Management_Libraray.repos
                     Console.WriteLine($"SQL Server Error: {error.Message}");
                 }
             }
-            finally { _connection.Close(); }
+            finally
+            {
+                _connection.Close();
+            }
 
             return products;
         }
@@ -103,6 +98,7 @@ namespace Inventory_Management_Libraray.repos
             Product fetchedProduct = null;
             try
             {
+                // Always returns one element (name => primary key)
                 using (var cmd = new SqlCommand("SELECT * FROM Products WHERE name = @p_name", _connection))
                 {
                     cmd.Parameters.AddWithValue("@p_name", productName);
@@ -110,14 +106,7 @@ namespace Inventory_Management_Libraray.repos
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-
-                        if (reader.Read())
-                        {
-                            fetchedProduct = new Product();
-                            fetchedProduct.Name = reader.GetString(0);
-                            fetchedProduct.Price = (float)reader.GetDouble(1);
-                            fetchedProduct.IncreaseQuantity(reader.GetInt32(2));
-                        }
+                        fetchedProduct = ReadProductList(reader)[0];
                     }
                 }
             }
@@ -125,13 +114,32 @@ namespace Inventory_Management_Libraray.repos
             {
                 Console.WriteLine(e);
             }
-            finally { _connection.Close(); }
+            finally
+            {
+                _connection.Close();
+            }
 
             return fetchedProduct;
         }
+        private List<Product> ReadProductList(SqlDataReader reader)
+        {
+            List<Product> products = new List<Product>();
 
+            while (reader.Read())
+            {
+                products.Add(ReadProduct(reader));
+            }
+            return products;
+        }
+        private Product ReadProduct(SqlDataReader reader)
+        {
+            var readProduct = new Product() { Name = reader.GetString(0), Price = (float)reader.GetDouble(1) };
+            readProduct.IncreaseQuantity(reader.GetInt32(2));
+            return readProduct;
+        }
         public bool RemoveProduct(string productName)
         {
+            int rowNum = 0;
             try
             {
                 using (var cmd = new SqlCommand("DELETE FROM Products WHERE name = @p_name", _connection))
@@ -139,12 +147,7 @@ namespace Inventory_Management_Libraray.repos
 
                     cmd.Parameters.AddWithValue("@p_name", productName);
                     _connection.Open();
-                    int rowNum = cmd.ExecuteNonQuery();
-
-                    if (rowNum > 0)
-                    {
-                        return true;
-                    }
+                    rowNum = cmd.ExecuteNonQuery();
                 }
             }
             catch (SqlException ex)
@@ -155,19 +158,14 @@ namespace Inventory_Management_Libraray.repos
             {
                 _connection.Close();
             }
-            return false;
+            return rowNum > 0;
         }
 
         public bool UpdateProduct(string productName, Product newProduct)
         {
-
-            if (productName == newProduct.Name)
-            {
-                return UpdateProductWithoutPrimary(productName, newProduct);
-            }
-
-            return UpdateProductWithPrimary(productName, newProduct);
-
+            return (productName == newProduct.Name) ?
+                UpdateProductWithoutPrimary(productName, newProduct) :
+                ReplaceProduct(productName, newProduct);
         }
         private bool UpdateProductWithoutPrimary(string productName, Product newProduct)
         {
@@ -179,7 +177,6 @@ namespace Inventory_Management_Libraray.repos
                     cmd.Connection = _connection;
                     _connection.Open();
                     success = UpdateProductCommand(productName, newProduct, cmd);
-
                 }
             }
             catch (SqlException ex)
@@ -192,37 +189,20 @@ namespace Inventory_Management_Libraray.repos
             }
             return success;
         }
-        private bool UpdateProductWithPrimary(string productName, Product newProduct)
-        {
-            var updateState = false;
-            try
-            {
-                updateState = SafeProductUpdate(productName, newProduct);
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine(ex);
-            }
-            finally
-            {
-                _connection.Close();
-            }
-            return updateState;
-        }
-        private bool SafeProductUpdate(string productName, Product newProduct)
+        private bool ReplaceProduct(string productName, Product newProduct)
         {
             bool updateState = false;
+
             _connection.Open();
             SqlTransaction transaction = _connection.BeginTransaction();
             try
             {
-                
                 using (var sqlCommand = new SqlCommand())
                 {
                     sqlCommand.Transaction = transaction;
                     sqlCommand.Connection = _connection;
 
-                    if (IsProductNameReserved(newProduct.Name, sqlCommand))
+                    if (!IsProductNameAvailable(newProduct.Name, sqlCommand))
                         return false;
 
                     DeleteProductCommand(productName, sqlCommand); // delete old product
@@ -233,27 +213,25 @@ namespace Inventory_Management_Libraray.repos
             }
             catch (SqlException ex)
             {
+                Console.WriteLine(ex);
                 transaction.Rollback();
             }
             finally
             {
                 transaction.Dispose();
+                _connection.Close();
             }
             return updateState;
         }
 
-        private bool IsProductNameReserved(string name, SqlCommand sqlCommand)
+        private bool IsProductNameAvailable(string name, SqlCommand sqlCommand)
         {
             sqlCommand.CommandText = "SELECT COUNT('*') FROM Products WHERE name = @p_name";
             sqlCommand.Parameters.AddWithValue("@p_name", name);
 
             int count = (int)sqlCommand.ExecuteScalar();
             sqlCommand.Parameters.Clear();
-            if (count != 0)
-            {
-                return true;
-            }
-            return false;
+            return count == 0;
         }
         private bool DeleteProductCommand(string productName, SqlCommand sqlCommand)
         {
@@ -263,7 +241,7 @@ namespace Inventory_Management_Libraray.repos
             int rowNum = sqlCommand.ExecuteNonQuery();
             sqlCommand.Parameters.Clear();
 
-            return (rowNum > 0);
+            return rowNum > 0;
         }
 
         private bool InsertProductCommand(Product newProduct, SqlCommand sqlCommand)
@@ -276,7 +254,7 @@ namespace Inventory_Management_Libraray.repos
             int rowNum = sqlCommand.ExecuteNonQuery();
             sqlCommand.Parameters.Clear();
 
-            return (rowNum > 0);
+            return rowNum > 0;
         }
 
         private bool UpdateProductCommand(string productName, Product newProduct, SqlCommand cmd)
@@ -288,7 +266,7 @@ namespace Inventory_Management_Libraray.repos
             cmd.Parameters.AddWithValue("@p_quan", newProduct.Quantity);
 
             int rowNum = cmd.ExecuteNonQuery();
-            return (rowNum > 0);
+            return rowNum > 0;
         }
     }
 }
