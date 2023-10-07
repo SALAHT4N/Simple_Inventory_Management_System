@@ -41,16 +41,15 @@ namespace Inventory_Management_Libraray.repos
             int numOfRows = 0;
             try
             {
-                using (var cmd = new SqlCommand("INSERT INTO Products(name, price, quantity) VALUES (@p_name, @p_price, @p_quantity)", _connection))
-                {
-                    cmd.Parameters.AddWithValue("@p_name", product.Name);
-                    cmd.Parameters.AddWithValue("@p_price", product.Price);
-                    cmd.Parameters.AddWithValue("@p_quantity", product.Quantity);
-
-                    _connection.Open();
-                    numOfRows = cmd.ExecuteNonQuery();
-
-                }
+                _connection.Open();
+                numOfRows = _connection.Execute(
+                    "INSERT INTO Products(name, price, quantity) VALUES (@name, @price, @quantity)",
+                    new
+                    {
+                        name = product.Name,
+                        price = product.Price,
+                        quantity = product.Quantity
+                    });
             }
             catch (SqlException ex)
             {
@@ -97,7 +96,7 @@ namespace Inventory_Management_Libraray.repos
                 // Always returns one element (name => primary key)
                 fetchedProduct = _connection.QueryFirst<Product>(
                     $"SELECT * FROM Products WHERE name = @name",
-                    new {name = productName}
+                    new { name = productName }
                     );
             }
             catch (SqlException e)
@@ -111,35 +110,13 @@ namespace Inventory_Management_Libraray.repos
 
             return fetchedProduct;
         }
-        private List<Product> ReadProductList(SqlDataReader reader)
-        {
-            // move reader.read to readProduct
-            List<Product> products = new List<Product>();
-
-            while (reader.Read())
-            {
-                products.Add(ReadProduct(reader));
-            }
-            return products;
-        }
-        private Product ReadProduct(SqlDataReader reader)
-        {
-            var readProduct = new Product() { Name = reader.GetString(0), Price = (float)reader.GetDouble(1) };
-            readProduct.IncreaseQuantity(reader.GetInt32(2));
-            return readProduct;
-        }
         public bool RemoveProduct(string productName)
         {
             int rowNum = 0;
             try
             {
-                using (var cmd = new SqlCommand("DELETE FROM Products WHERE name = @p_name", _connection))
-                {
-
-                    cmd.Parameters.AddWithValue("@p_name", productName);
-                    _connection.Open();
-                    rowNum = cmd.ExecuteNonQuery();
-                }
+                _connection.Open();
+                rowNum = _connection.Execute("DELETE FROM Products WHERE name = @name", new { name = productName });
             }
             catch (SqlException ex)
             {
@@ -238,14 +215,8 @@ namespace Inventory_Management_Libraray.repos
 
         private bool InsertProductCommand(Product newProduct, SqlCommand sqlCommand)
         {
-            sqlCommand.CommandText = "INSERT INTO Products(name, price, quantity) VALUES (@p_name, @p_price, @p_quantity)";
-            sqlCommand.Parameters.AddWithValue("@p_name", newProduct.Name);
-            sqlCommand.Parameters.AddWithValue("@p_price", newProduct.Price);
-            sqlCommand.Parameters.AddWithValue("@p_quantity", newProduct.Quantity);
-
-            int rowNum = sqlCommand.ExecuteNonQuery();
-            sqlCommand.Parameters.Clear();
-
+            int rowNum = _connection.Execute("INSERT INTO Products(name, price, quantity) VALUES (@name, @price, @quantity)",
+                new List<Product> { newProduct });
             return rowNum > 0;
         }
 
