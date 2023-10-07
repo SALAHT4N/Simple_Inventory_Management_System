@@ -12,6 +12,7 @@ namespace Inventory_Management_Libraray.repos
 
         public SqlServerProductRepository()
         {
+            // make a generic repo for product that takes in a database connection as DbConnection
             try
             {
                 var builder = new SqlConnectionStringBuilder();
@@ -34,6 +35,7 @@ namespace Inventory_Management_Libraray.repos
         }
         public bool AddProduct(Product product)
         {
+            // make scoped scope for connection 
             int numOfRows = 0;
             try
             {
@@ -123,6 +125,7 @@ namespace Inventory_Management_Libraray.repos
         }
         private List<Product> ReadProductList(SqlDataReader reader)
         {
+            // move reader.read to readProduct
             List<Product> products = new List<Product>();
 
             while (reader.Read())
@@ -191,6 +194,7 @@ namespace Inventory_Management_Libraray.repos
         }
         private bool ReplaceProduct(string productName, Product newProduct)
         {
+            // create new command for each operation 
             bool updateState = false;
 
             _connection.Open();
@@ -260,7 +264,6 @@ namespace Inventory_Management_Libraray.repos
         private bool UpdateProductCommand(string productName, Product newProduct, SqlCommand cmd)
         {
             cmd.CommandText = "UPDATE Products SET Price = @p_price, Quantity = @p_quan WHERE name = @p_name";
-
             cmd.Parameters.AddWithValue("@p_name", productName);
             cmd.Parameters.AddWithValue("@p_price", newProduct.Price);
             cmd.Parameters.AddWithValue("@p_quan", newProduct.Quantity);

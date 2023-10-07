@@ -12,9 +12,9 @@ namespace Inventory_Management_Libraray.repos
         private MongoClient _client;
         private IMongoDatabase _database;
         private IMongoCollection<Product> _productsCollection;
+
         public MongoDbProductRepository()
         {
-
             var connectionString = Environment.GetEnvironmentVariable("MONGODB_URI") ?? "mongodb://localhost:27017";
             if (connectionString == null)
             {
@@ -25,6 +25,7 @@ namespace Inventory_Management_Libraray.repos
             _database = _client.GetDatabase("Simple_Inventory");
             _productsCollection = _database.GetCollection<Product>("Products");
         }
+
         public bool AddProduct(Product product)
         {
             var insertState = false;
@@ -60,6 +61,7 @@ namespace Inventory_Management_Libraray.repos
 
         public bool RemoveProduct(string productName)
         {
+            // configure client mongo to throw exceptions when ... (search)
             var result = _productsCollection.DeleteOne(p => p.Name == productName);
             return result.DeletedCount == 1;
         }
