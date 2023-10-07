@@ -6,7 +6,7 @@ namespace Inventory_Management_System
 {
     public class ManagementSystem
     {
-        static private Inventory inventory = new Inventory(new MongoDbProductRepository());
+        static private Inventory inventory = new Inventory(new SqlServerProductRepository());
         public static ErrorLevels AddProduct(ProductDetails details)
         {
             var status = inventory.AddProduct(details.Name, details.Price, details.Quantity);

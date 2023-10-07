@@ -1,8 +1,10 @@
-﻿using Inventory_Management_Libraray.interfaces;
+﻿using Dapper;
+using Inventory_Management_Libraray.interfaces;
 using Inventory_Management_Library;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Inventory_Management_Libraray.repos
 {
@@ -70,15 +72,7 @@ namespace Inventory_Management_Libraray.repos
 
             try
             {
-                using (SqlCommand cmd = new SqlCommand("SELECT * FROM Products;", _connection))
-                {
-                    _connection.Open();
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        products = ReadProductList(reader);
-                    }
-                }
-
+                products = _connection.Query<Product>("SELECT * FROM Products").ToList();
             }
             catch (SqlException ex)
             {
@@ -101,16 +95,10 @@ namespace Inventory_Management_Libraray.repos
             try
             {
                 // Always returns one element (name => primary key)
-                using (var cmd = new SqlCommand("SELECT * FROM Products WHERE name = @p_name", _connection))
-                {
-                    cmd.Parameters.AddWithValue("@p_name", productName);
-                    _connection.Open();
-
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        fetchedProduct = ReadProductList(reader)[0];
-                    }
-                }
+                fetchedProduct = _connection.QueryFirst<Product>(
+                    $"SELECT * FROM Products WHERE name = @name",
+                    new {name = productName}
+                    );
             }
             catch (SqlException e)
             {

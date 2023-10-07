@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Data;
+using System.Linq;
+using Dapper;
 using Inventory_Management_Libraray.repos;
 using Inventory_Management_Library;
+using Microsoft.Data.SqlClient;
+
 namespace Inventory_Management_System
 {
     public class Program
@@ -254,10 +259,23 @@ namespace Inventory_Management_System
             //ManagementSystem.AddProduct(new ProductDetails("cola5", 2.5, 5));
 
         }
+        private static void InitDapperPlayground()
+        {
+            var builder = new SqlConnectionStringBuilder();
+            builder.DataSource = "LAPTOP-TCMGSSUR";
+            builder.InitialCatalog = "Simple_Inventory_Management_System";
+            builder.IntegratedSecurity = true;
+            builder.Encrypt = false;
+
+            var connection = new SqlConnection(builder.ConnectionString);
+            var products = connection.Query<Product>("SELECT * FROM Products").ToList();
+            products.ForEach(p => { Console.WriteLine(p.Name); });
+        }
         public static void Main(string[] args)
         {
-            Init();
+            //Init();
             PrintTitleLogo();
+            //InitDapperPlayground();
             Run();
         }
     }

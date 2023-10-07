@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.4" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.21.0" />
     <PackageReference Include="MongoDB.Driver.Core" Version="2.21.0" />
