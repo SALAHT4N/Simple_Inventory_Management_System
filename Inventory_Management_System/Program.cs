@@ -1,4 +1,5 @@
 ﻿using System;
+using Inventory_Management_Libraray.repos;
 using Inventory_Management_Library;
 namespace Inventory_Management_System
 {
@@ -161,7 +162,7 @@ namespace Inventory_Management_System
                 case ProductOptions.EditProduct:
 
                     level = EditProduct(selectedName);
-                    if (level == ErrorLevels.ProductAlreadyExists) BadCommandMessage("Product Already Exists!");
+                    if (level == ErrorLevels.CannotDo) BadCommandMessage("Product Already Exists!");
                     else if (level == ErrorLevels.CommandDone) SuccessfulCommandMessage("Edited Successfully! ");
                     else if (level == ErrorLevels.WrongInput) BadCommandMessage("Check your input! ");
                     break;
@@ -245,12 +246,12 @@ namespace Inventory_Management_System
         private static void Init()
         {
             // TODO Add placeholder products to inventory.
-            ManagementSystem.AddProduct(new ProductDetails("cola", 2.5, 5));
-            ManagementSystem.AddProduct(new ProductDetails("pepsi", 2, 6));
-            ManagementSystem.AddProduct(new ProductDetails("cola2", 2.5, 5));
-            ManagementSystem.AddProduct(new ProductDetails("cola3", 2.5, 5));
-            ManagementSystem.AddProduct(new ProductDetails("cola4", 2.5, 5));
-            ManagementSystem.AddProduct(new ProductDetails("cola5", 2.5, 5));
+            //ManagementSystem.AddProduct(new ProductDetails("cola", 2.5, 5));
+            //ManagementSystem.AddProduct(new ProductDetails("pepsi", 2, 6));
+            //ManagementSystem.AddProduct(new ProductDetails("cola2", 2.5, 5));
+            //ManagementSystem.AddProduct(new ProductDetails("cola3", 2.5, 5));
+            //ManagementSystem.AddProduct(new ProductDetails("cola4", 2.5, 5));
+            //ManagementSystem.AddProduct(new ProductDetails("cola5", 2.5, 5));
 
         }
         public static void Main(string[] args)

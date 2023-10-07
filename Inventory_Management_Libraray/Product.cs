@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Inventory_Management_Library
+﻿namespace Inventory_Management_Library
 {
-    internal class Product
+    public class Product
     {
         public string Name
         {
@@ -16,7 +10,7 @@ namespace Inventory_Management_Library
         private double price;
         public double Price
         {
-            get 
+            get
             {
                 return price;
             }
@@ -43,7 +37,7 @@ namespace Inventory_Management_Library
         }
 
         public string GetDetails(DisplayFormat type) => (type == DisplayFormat.Full) ? FullDisplay() : ShortDisplay();
-      
+
         private string ShortDisplay() => $"{Name}: {Quantity} in stock";
         private string FullDisplay() =>
             $"| Name: {Name}".PadRight(25) + "|\n" +

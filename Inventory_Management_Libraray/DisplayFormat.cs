@@ -1,6 +1,6 @@
 ﻿namespace Inventory_Management_Library
 {
-    internal enum DisplayFormat
+    public enum DisplayFormat
     {
         // often public
         Short, Full

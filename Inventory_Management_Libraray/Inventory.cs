@@ -1,87 +1,59 @@
-﻿using System;
+﻿using Inventory_Management_Libraray.interfaces;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Inventory_Management_Library
 {
     public class Inventory
     {
-        private List<Product> products = new();
-
-        private Product GetProduct(string name)
+        private readonly IProductRepository _productRepository;
+        public Inventory(IProductRepository productRepository)
         {
-            foreach (var p in products)
-            {
-                if (p.Name == name) return p;
-            }
-            return null;
+            _productRepository = productRepository;
         }
-
         public ErrorLevels AddProduct(string name, double price, int quantity)
         {
-            if (CheckProductPresence(name) != ErrorLevels.ProductNotFound) 
-                return ErrorLevels.ProductAlreadyExists;
+            var product = new Product() { Name = name, Price = price };
+            product.IncreaseQuantity(quantity);
 
-            Product addedProduct = new() { Name = name, Price = price };
-            products.Add(addedProduct);
-            addedProduct.IncreaseQuantity(quantity);
+            if (_productRepository.AddProduct(product))
+                return ErrorLevels.CommandDone;
 
-            return ErrorLevels.CommandDone;
+            return ErrorLevels.ProductAlreadyExists;
         }
         public ErrorLevels RemoveProduct(string name)
         {
-            Product remove = GetProduct(name);
+            if (_productRepository.RemoveProduct(name))
+                return ErrorLevels.CommandDone;
 
-            if (remove == null) return ErrorLevels.ProductNotFound;
+            return ErrorLevels.ProductNotFound;
+        }
+        public ErrorLevels EditProduct(string name, ProductDetails productDetails)
+        {
+            var product = new Product() { Name = productDetails.Name, Price = productDetails.Price };
+            product.IncreaseQuantity(productDetails.Quantity);
 
-            products.Remove(remove);
+            if (!_productRepository.UpdateProduct(name, product))
+            {
+                return ErrorLevels.CannotDo;
+            }
             return ErrorLevels.CommandDone;
         }
-
-        private ErrorLevels CheckEditability(string name, string newName)
+        private Product GetProduct(string name)
         {
-            if (GetProduct(newName) != null) return ErrorLevels.ProductAlreadyExists;
-
-            Product edit = GetProduct(name);
-            if (edit == null) return ErrorLevels.ProductNotFound;
-
-            return ErrorLevels.ProductFound;
+            return _productRepository.GetProduct(name);
         }
-        public ErrorLevels CheckProductPresence(string name) => 
-            (GetProduct(name) != null) ? 
-            ErrorLevels.ProductFound : 
+        public IEnumerable<string> GetAllProducts()
+        {
+            foreach (var p in _productRepository.GetAllProducts())
+            {
+                yield return p.GetDetails(DisplayFormat.Short);
+            }
+        }
+        public ErrorLevels CheckProductPresence(string name) =>
+            (GetProduct(name) != null) ?
+            ErrorLevels.ProductFound :
             ErrorLevels.ProductNotFound;
         
-        public ErrorLevels EditProductQuantity(string name, int quantity)
-        {
-            Product edit = GetProduct(name);
-            if (edit == null) return ErrorLevels.ProductNotFound;
-
-            edit.Consume(edit.Quantity);
-            edit.IncreaseQuantity(quantity);
-
-            return ErrorLevels.CommandDone;
-        }
-        public ErrorLevels EditProductPrice(string name, double price)
-        {
-            Product edit = GetProduct(name);
-            if (edit == null) return ErrorLevels.ProductNotFound;
-            edit.Price = price;
-
-            return ErrorLevels.CommandDone;
-        }
-        public ErrorLevels EditProductName(string name, string newName)
-        {
-            ErrorLevels level = CheckEditability(name, newName);
-            if (level != ErrorLevels.ProductFound) return level;
-
-            Product edit = GetProduct(name);
-            edit.Name = newName;
-
-            return ErrorLevels.CommandDone;
-        }
         public string GetProductDetails(string name) =>
             GetProduct(name).GetDetails(DisplayFormat.Full);
         public ProductDetails GetProductDetailsRecord(string name)
@@ -90,18 +62,10 @@ namespace Inventory_Management_Library
             return new ProductDetails(p.Name, p.Price, p.Quantity);
 
         }
-
         public double GetProductPrice(string name) =>
             GetProduct(name).Price;
         public int GetProductQuantity(string name) =>
             GetProduct(name).Quantity;
 
-        public IEnumerable<string> GetAllProducts()
-        {
-            foreach(var p in products)
-            {
-                yield return p.GetDetails(DisplayFormat.Short);
-            }
-        }
     }
 }
