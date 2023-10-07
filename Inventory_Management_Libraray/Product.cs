@@ -1,12 +1,16 @@
-﻿namespace Inventory_Management_Library
+﻿using MongoDB.Bson.Serialization.Attributes;
+
+namespace Inventory_Management_Library
 {
     public class Product
     {
+        [BsonElement("name")]
         public string Name
         {
             get; set;
         } = string.Empty;
 
+        [BsonElement("price")]
         private double price;
         public double Price
         {
@@ -19,7 +23,7 @@
                 price = (value > 0) ? value : 0;
             }
         }
-
+        [BsonElement("quantity")]
         public int Quantity
         {
             get; private set;
